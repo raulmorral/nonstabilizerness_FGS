@@ -8,7 +8,7 @@ from scipy.stats import ortho_group
 import scipy.sparse as sp
 import scipy.sparse.csgraph as csgraph
 
-# from pfapack import pfaffian as pf
+from pfapack import pfaffian as pf
 
 
 
@@ -183,7 +183,7 @@ class FGS(object):
         """
         Updates the covariance matrix of the state by applying the accumulated evolution in R.
         The correlation matrix is defined as C = <alpha alpha+> with alpha = (a1+, ..., aL+, a1, ..., aL)^T
-        (+ = \dagger).
+        (+ = dagger).
         """
         
         if not self.updated:
@@ -200,6 +200,16 @@ class FGS(object):
         self.R[:, 2*i : 2*i + 4] = self.R[:, 2*i : 2*i+4] @ O
         
         self.updated = False
+
+    def apply_U_global(self, O):
+        """
+        Applies unitary U in the whole state.
+        """
+                
+        self.R = self.R @ O
+        
+        self.updated = False
+        self.update_covariance_matrix()
         
     def apply_T_gate(self, k):
         """
